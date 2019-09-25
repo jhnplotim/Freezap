@@ -5,12 +5,14 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.openclassrooms.freezap.R;
+import com.openclassrooms.freezap.Utils.MyAsyncTask;
 import com.openclassrooms.freezap.Utils.MyHandlerThread;
 import com.openclassrooms.freezap.Utils.Utils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyAsyncTask.Listeners {
 
     //FOR DESIGN
     private ProgressBar progressBar;
@@ -57,11 +59,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 50:
                 break;
-            case 60:
+            case 60: // CASE USER CLICKED ON BUTTON "EXECUTE ASYNCTASK"
+                this.startAsyncTask();
                 break;
             case 70:
                 break;
         }
+    }
+
+    // 3 - We create and start our AsyncTask
+    private void startAsyncTask() {
+        new MyAsyncTask(this).execute();
     }
 
     // -----------------
@@ -80,5 +88,35 @@ public class MainActivity extends AppCompatActivity {
     // 4 - EXECUTE HANDLER THREAD
     private void startHandlerThread(){
         handlerThread.startHandler();
+    }
+
+
+    // 2 - Override methods of callback
+    @Override
+    public void onPreExecute() {
+        // 2.1 - We update our UI before task (starting ProgressBar)
+        this.updateUIBeforeTask();
+    }
+
+    @Override
+    public void doInBackground() { }
+
+    @Override
+    public void onPostExecute(Long taskEnd) {
+        // 2.2 - We update our UI before task (stopping ProgressBar)
+        this.updateUIAfterTask(taskEnd);
+    }
+
+    // -----------------
+    // UPDATE UI
+    // -----------------
+
+    public void updateUIBeforeTask(){
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void updateUIAfterTask(Long taskEnd){
+        progressBar.setVisibility(View.GONE);
+        Toast.makeText(this, "Task is finally finished at : "+taskEnd+" !", Toast.LENGTH_SHORT).show();
     }
 }
